@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "helm_janitor/cmd"
+import "github.com/isutton/helm-janitor/cmd"
 
 func main() {
 	cmd.Execute()
