@@ -5,52 +5,48 @@ import (
 )
 
 type Settings struct {
-	dryRun               bool
-	releaseName          string
-	KubeConfig           string
-	helmPlugins          string
-	helmPluginDir        string
-	helmBin              string
-	helmRegistryConfig   string
-	helmRepositoryCache  string
-	helmRepositoryConfig string
-	helmNamespace        string
-	helmKubeContext      string
-}
-
-func (s *Settings) Namespace() string {
-	return s.helmNamespace
-}
-
-func (s *Settings) ReleaseName() string {
-	return s.releaseName
-}
-
-func (s *Settings) SetReleaseName(n string) {
-	s.releaseName = n
-}
-
-func (s *Settings) DryRun() bool {
-	return s.dryRun
-}
-
-func (s *Settings) SetDryRun(b bool) {
-	s.dryRun = b
+	DryRun      bool
+	ReleaseName string
+	KubeConfig  string
+	// PluginName is the name of the plugin, as invoked by helm. So helm myplug will have the
+	// short name myplug.
+	PluginName string
+	// PluginsDirectory is the path to the plugins directory.
+	PluginsDirectory string
+	// PluginDirectory is the directory that contains the plugin.
+	PluginDirectory string
+	// ProgramPath is the path to the helm command (as executed by the user).
+	ProgramPath string
+	// Debug indicates if the debug flag was set by helm.
+	Debug bool
+	// RegistryConfig is the location for the registry configuration (if using). Note that the
+	// use of Helm with registries is an experimental feature.
+	RegistryConfig string
+	// RepositoryCache is the path to the repository cache files.
+	RepositoryCache string
+	// RepositoryConfig is the path to the repository configuration file.
+	RepositoryConfig string
+	// Namespace is the Namespace given to the helm command (generally using the -n flag).
+	Namespace string
+	// KubeContext is the name of the Kubernetes config context given to the helm command.
+	KubeContext string
+	// MaxHistory is the max release history maintained.
+	MaxHistory int
 }
 
 func NewSettings() *Settings {
 	return &Settings{
-		dryRun:               env.BoolOr("HELM_JANITOR_CLEAN_DRY_RUN", false),
-		releaseName:          "",
-		KubeConfig:           env.String("KUBECONFIG"),
-		helmPlugins:          env.String("HELM_PLUGINS"),
-		helmPluginDir:        env.String("HELM_PLUGIN_DIR"),
-		helmBin:              env.String("HELM_DEBUG"),
-		helmRegistryConfig:   env.String("HELM_REGISTRY_CONFIG"),
-		helmRepositoryCache:  env.String("HELM_REPOSITORY_CACHE"),
-		helmRepositoryConfig: env.String("HELM_REPOSITORY_CONFIG"),
-		helmNamespace:        env.String("HELM_NAMESPACE"),
-		helmKubeContext:      env.String("HELM_KUBECONTEXT"),
+		DryRun:           env.BoolOr("HELM_JANITOR_CLEAN_DRY_RUN", false),
+		ReleaseName:      "",
+		KubeConfig:       env.String("KUBECONFIG"),
+		PluginsDirectory: env.String("HELM_PLUGINS"),
+		PluginDirectory:  env.String("HELM_PLUGIN_DIR"),
+		ProgramPath:      env.String("HELM_DEBUG"),
+		RegistryConfig:   env.String("HELM_REGISTRY_CONFIG"),
+		RepositoryCache:  env.String("HELM_REPOSITORY_CACHE"),
+		RepositoryConfig: env.String("HELM_REPOSITORY_CONFIG"),
+		Namespace:        env.String("HELM_NAMESPACE"),
+		KubeContext:      env.String("HELM_KUBECONTEXT"),
+		MaxHistory:       env.Int("HELM_MAX_HISTORY"),
 	}
 }
-

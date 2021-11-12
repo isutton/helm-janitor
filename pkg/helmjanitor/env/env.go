@@ -37,3 +37,19 @@ func StringOr(name string, def string) string {
 	}
 	return envVal
 }
+
+func Int(name string) int {
+	envVal := String(name)
+	intVal, err := strconv.Atoi(envVal)
+	if err != nil {
+		return 0
+	}
+	return intVal
+}
+
+func IntOr(name string, def int) int {
+	if name == "" {
+		return def
+	}
+	return Int(name)
+}

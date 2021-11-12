@@ -1,4 +1,4 @@
-package cmd
+ package cmd
 
 import (
 	"context"
@@ -28,21 +28,19 @@ func init() {
 		Short: "Removes unused artifacts of previous releases",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			settings.SetReleaseName(args[0])
+			settings.ReleaseName = args[0]
 
 			dryRun, ok, _ := flags.GetBoolPtr(cmd.Flags(), dryRunFlag)
 			if ok {
-				settings.SetDryRun(dryRun)
+				settings.DryRun = dryRun
 			}
-			config, err := clientcmd.BuildConfigFromFlags("", settings.KubeConfig)
+
+			clientset, err := buildClientset(settings)
 			if err != nil {
-				return fmt.Errorf("building config from flags: %w", err)
+				return err
 			}
-			clientset, err := kubernetes.NewForConfig(config)
-			if err != nil {
-				return fmt.Errorf("creating clientset: %w", err)
-			}
-			nsSecretsInterface := clientset.CoreV1().Secrets(settings.Namespace())
+			
+			nsSecretsInterface := clientset.CoreV1().Secrets(settings.Namespace)
 
 			return handleClean(
 				cmd.OutOrStderr(), nsSecretsInterface, settings)
@@ -51,6 +49,18 @@ func init() {
 
 	rootCmd.AddCommand(cleanCmd)
 	cleanCmd.Flags().Bool(dryRunFlag, false, "do not perform any destructive action")
+}
+
+func buildClientset(settings *clean.Settings) (*kubernetes.Clientset, error) {
+	config, err := clientcmd.BuildConfigFromFlags("", settings.KubeConfig)
+	if err != nil {
+		return nil, fmt.Errorf("building config from flags: %w", err)
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		err = fmt.Errorf("creating clientset: %w", err)
+	}
+	return clientset, err
 }
 
 func handleClean(
@@ -63,7 +73,7 @@ func handleClean(
 	labelSelector := &metav1.LabelSelector{
 		MatchLabels: map[string]string{
 			"owner": "helm",
-			"name":  s.ReleaseName(),
+			"name":  s.ReleaseName,
 		},
 	}
 
@@ -78,17 +88,17 @@ func handleClean(
 	}
 	secretList, err := secretInterface.List(ctx, listOptions)
 	if err != nil {
-		return fmt.Errorf("listing secrets for release %q: %w", s.ReleaseName(), err)
+		return fmt.Errorf("listing secrets for release %q: %w", s.ReleaseName, err)
 	}
 
-	fmt.Fprintf(w, "Found %d secret(s) for release %q\n", len(secretList.Items), s.ReleaseName())
+	fmt.Fprintf(w, "Found %d secret(s) for release %q\n", len(secretList.Items), s.ReleaseName)
 	for _, e := range secretList.Items {
 		fmt.Fprintf(w, "- %s\n", e.Name)
-		if settings.DryRun() {
+		if settings.DryRun {
 			fmt.Fprintf(w, "  Would delete secret %q\n", e.Name)
 		} else {
 			deleteOptions := metav1.DeleteOptions{}
-			if settings.DryRun() {
+			if settings.DryRun {
 				deleteOptions.DryRun = []string{"All"}
 			}
 			err := secretInterface.Delete(ctx, e.Name, deleteOptions)
