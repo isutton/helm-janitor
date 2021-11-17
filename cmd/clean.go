@@ -1,12 +1,13 @@
- package cmd
+package cmd
 
 import (
 	"context"
 	"fmt"
 	"io"
 
-	"github.com/isutton/helm-janitor/cmd/clean"
+	"github.com/isutton/helm-janitor/pkg/helm/plugin"
 	"github.com/isutton/helm-janitor/pkg/helmjanitor/flags"
+
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -17,10 +18,10 @@ import (
 
 var cleanCmd *cobra.Command
 
-var settings *clean.Settings
+var settings *plugin.Settings
 
 func init() {
-	settings = clean.NewSettings()
+	settings = plugin.NewSettings()
 	dryRunFlag := "dry-run"
 
 	cleanCmd = &cobra.Command{
@@ -39,7 +40,7 @@ func init() {
 			if err != nil {
 				return err
 			}
-			
+
 			nsSecretsInterface := clientset.CoreV1().Secrets(settings.Namespace)
 
 			return handleClean(
@@ -51,7 +52,7 @@ func init() {
 	cleanCmd.Flags().Bool(dryRunFlag, false, "do not perform any destructive action")
 }
 
-func buildClientset(settings *clean.Settings) (*kubernetes.Clientset, error) {
+func buildClientset(settings *plugin.Settings) (*kubernetes.Clientset, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", settings.KubeConfig)
 	if err != nil {
 		return nil, fmt.Errorf("building config from flags: %w", err)
@@ -66,10 +67,10 @@ func buildClientset(settings *clean.Settings) (*kubernetes.Clientset, error) {
 func handleClean(
 	w io.Writer,
 	secretInterface typedv1.SecretInterface,
-	s *clean.Settings,
+	s *plugin.Settings,
 ) error {
 	ctx := context.Background()
-	
+
 	labelSelector := &metav1.LabelSelector{
 		MatchLabels: map[string]string{
 			"owner": "helm",

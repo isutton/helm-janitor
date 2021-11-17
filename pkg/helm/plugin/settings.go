@@ -1,7 +1,7 @@
-package clean
+package plugin
 
 import (
-	"github.com/isutton/helm-janitor/pkg/helmjanitor/env"
+	"github.com/isutton/helm-janitor/pkg/helm/plugin/env"
 )
 
 type Settings struct {
