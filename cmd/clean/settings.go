@@ -41,7 +41,7 @@ func NewSettings() *Settings {
 		KubeConfig:       env.String("KUBECONFIG"),
 		PluginsDirectory: env.String("HELM_PLUGINS"),
 		PluginDirectory:  env.String("HELM_PLUGIN_DIR"),
-		ProgramPath:      env.String("HELM_DEBUG"),
+		ProgramPath:      env.String("HELM_BIN"),
 		RegistryConfig:   env.String("HELM_REGISTRY_CONFIG"),
 		RepositoryCache:  env.String("HELM_REPOSITORY_CACHE"),
 		RepositoryConfig: env.String("HELM_REPOSITORY_CONFIG"),
