@@ -7,7 +7,7 @@ import (
 type Settings struct {
 	DryRun      bool
 	ReleaseName string
-	KubeConfig  string
+	Kubeconfig  string
 	// PluginName is the name of the plugin, as invoked by helm. So helm myplug will have the
 	// short name myplug.
 	PluginName string
@@ -38,7 +38,7 @@ func NewSettings() *Settings {
 	return &Settings{
 		DryRun:           env.BoolOr("HELM_JANITOR_CLEAN_DRY_RUN", false),
 		ReleaseName:      "",
-		KubeConfig:       env.String("KUBECONFIG"),
+		Kubeconfig:       env.String("KUBECONFIG"),
 		PluginsDirectory: env.String("HELM_PLUGINS"),
 		PluginDirectory:  env.String("HELM_PLUGIN_DIR"),
 		ProgramPath:      env.String("HELM_BIN"),

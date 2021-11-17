@@ -2,7 +2,7 @@ name: "janitor"
 version: "0.1.0"
 usage: ""
 description: ""
-ignoreFlags: true
+ignoreFlags: false
 platformCommand:
   - os: linux
     arch: amd64

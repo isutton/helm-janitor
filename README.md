@@ -1,6 +1,6 @@
 # helm-janitor
 
-`helm-janitor` is a Helm plugin that remove failed releases revisions from the cluster.
+`helm-janitor` is a Helm plugin that remove failed release revisions from a Kubernetes cluster.
 
 ## Installing from sources
 
