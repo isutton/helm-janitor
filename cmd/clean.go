@@ -26,7 +26,7 @@ func init() {
 
 	cleanCmd = &cobra.Command{
 		Use:   "clean [flags] release-name",
-		Short: "Removes unused artifacts of previous releases",
+		Short: "remove unused artifacts of previous failed releases",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			settings.ReleaseName = args[0]
