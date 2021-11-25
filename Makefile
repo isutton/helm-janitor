@@ -25,3 +25,7 @@ uninstall:
 .PHONY: clean
 clean:
 	rm -fr ./dist
+
+.PHONY: tidy
+tidy:
+	go mod tidy
