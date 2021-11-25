@@ -60,8 +60,10 @@ func init() {
 
 			nsSecretsInterface := clientset.CoreV1().Secrets(settings.Namespace)
 
+			ctx := context.Background()
+
 			return handleClean(
-				cmd.OutOrStderr(), nsSecretsInterface, settings)
+				ctx, cmd.OutOrStderr(), nsSecretsInterface, settings)
 		},
 	}
 	kubeconfig = addKubeconfigFlag(cleanCmd.Flags())
@@ -82,12 +84,11 @@ func buildClientset(settings *plugin.Settings) (*kubernetes.Clientset, error) {
 }
 
 func handleClean(
+	ctx context.Context,
 	w io.Writer,
 	secretInterface typedv1.SecretInterface,
 	s *plugin.Settings,
 ) error {
-	ctx := context.Background()
-
 	labelSelector := &metav1.LabelSelector{
 		MatchLabels: map[string]string{
 			"owner": "helm",
